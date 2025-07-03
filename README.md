@@ -2,6 +2,8 @@
 
 This tool extracts product details from Flipkart using a list of FSINs stored in an Excel file. It features a simple GUI to upload your file, click Start, and get results in a new Excel file.
 
+This little script was shamelessly inspired by an Amazon scraper (you know who you are 👀).
+Feel free to call me a cheater — the kind who proudly survives on nothing but Ctrl + C and Ctrl + V.
 ---
 
 ## ✨ Features
