@@ -10,7 +10,7 @@ import os
 prod_data = []
 failed_fsins = Queue()
 
-def fetch_worker(queue):
+def fetch_worker(queue, progress_callback=None, completed=None, total=None):
     while not queue.empty():
         fsin = queue.get()
         for attempt in range(2):  # 1 retry
@@ -29,19 +29,24 @@ def fetch_worker(queue):
                 print(f"Error for {fsin}: {e}")
         else:
             failed_fsins.put(fsin)
+        if completed is not None:
+            completed[0] += 1
+            if progress_callback:
+                progress_callback(completed[0], total)
         queue.task_done()
 
-def start_scraping(file_path):
+def start_scraping(file_path, progress_callback=None):
     df = pd.read_excel(file_path, header=None)
     fsins = df.iloc[:, 0].dropna().astype(str).tolist()
-    
+    total = len(fsins)
+    completed = [0]
     q = Queue()
     for fsin in fsins:
         q.put(fsin)
 
     threads = []
     for _ in range(15):
-        t = Thread(target=fetch_worker, args=(q,))
+        t = Thread(target=fetch_worker, args=(q, progress_callback, completed, total))
         t.start()
         threads.append(t)
 
