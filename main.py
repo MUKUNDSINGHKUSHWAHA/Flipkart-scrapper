@@ -240,6 +240,12 @@ class FlipkartScraperApp:
             messagebox.showwarning("No file", "Please select an Excel file.")
             return
         
+        # Prompt user for output folder
+        output_folder = filedialog.askdirectory(title="Select output folder")
+        if not output_folder:
+            self.status_label.config(text="Output folder not selected.", fg="red")
+            return
+        
         self.status_label.config(text="Scraping in progress... Please wait.", fg=self.BUTTON_BG)
         self.progress_bar['value'] = 0
         
@@ -250,9 +256,9 @@ class FlipkartScraperApp:
         
         def run_scraping():
             try:
-                success_count, failure_count, output_path = start_scraping(path, progress_callback)
+                success_count, failure_count, output_path_final = start_scraping(path, progress_callback, output_folder)
                 self.status_label.config(
-                    text=f"✅ Scraping completed!\nSuccess: {success_count} | Failed: {failure_count}\nOutput saved to:\n{output_path}",
+                    text=f"✅ Scraping completed!\nSuccess: {success_count} | Failed: {failure_count}\nOutput saved to:\n{output_path_final}",
                     fg=self.SUCCESS_COLOR
                 )
                 self.progress_bar['value'] = 100
