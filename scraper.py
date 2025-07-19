@@ -35,7 +35,7 @@ def fetch_worker(queue, progress_callback=None, completed=None, total=None):
                 progress_callback(completed[0], total)
         queue.task_done()
 
-def start_scraping(file_path, progress_callback=None):
+def start_scraping(file_path, progress_callback=None, output_folder=None):
     df = pd.read_excel(file_path, header=None)
     fsins = df.iloc[:, 0].dropna().astype(str).tolist()
     total = len(fsins)
@@ -54,9 +54,14 @@ def start_scraping(file_path, progress_callback=None):
         t.join()
 
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    output_dir = "D:/flipkart-scrapper"
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = f"{output_dir}/flipkart_output_{now}.xlsx"
+    if output_folder is None:
+        output_dir = "D:/flipkart-scrapper"
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = f"{output_dir}/flipkart_output_{now}.xlsx"
+    else:
+        os.makedirs(output_folder, exist_ok=True)
+        output_path = os.path.join(output_folder, f"flipkart_output_{now}.xlsx")
+
     with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
         pd.DataFrame(prod_data).to_excel(writer, sheet_name="Success", index=False)
         pd.DataFrame(list(failed_fsins.queue), columns=["fsin"]).to_excel(writer, sheet_name="Failed", index=False)
